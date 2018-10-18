@@ -47,7 +47,7 @@
 
 
 cmake_minimum_required (VERSION 3.1)
-project(jansson C)
+project(bosjansson C)
 
 # Options
 option(JANSSON_BUILD_SHARED_LIBS "Build shared libraries." OFF)
@@ -318,8 +318,8 @@ set (JANSSON_INITIAL_HASHTABLE_ORDER 3 CACHE STRING "Number of buckets new objec
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/jansson_config.h.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/include/jansson_config.h)
 
-# Copy the jansson.h file to the public include folder
-file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/jansson.h
+# Copy the bosjansson.h file to the public include folder
+file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/bosjansson.h
            DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
 
 add_definitions(-DJANSSON_USING_CMAKE)
@@ -346,34 +346,34 @@ set(JANSSON_HDR_PRIVATE
 
 set(JANSSON_HDR_PUBLIC
    ${CMAKE_CURRENT_BINARY_DIR}/include/jansson_config.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/jansson.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bosjansson.h)
 
 source_group("Library Sources" FILES ${JANSSON_SRC})
 source_group("Library Private Headers" FILES ${JANSSON_HDR_PRIVATE})
 source_group("Library Public Headers" FILES ${JANSSON_HDR_PUBLIC})
 
 if(JANSSON_BUILD_SHARED_LIBS)
-   add_library(jansson SHARED
+   add_library(bosjansson SHARED
       ${JANSSON_SRC}
       ${JANSSON_HDR_PRIVATE}
       ${JANSSON_HDR_PUBLIC}
-      src/jansson.def)
+           src/bosjansson.def)
 
-   set_target_properties(jansson PROPERTIES
+   set_target_properties(bosjansson PROPERTIES
       VERSION ${JANSSON_VERSION}
       SOVERSION ${JANSSON_SOVERSION})
 else()
-   add_library(jansson STATIC
+   add_library(bosjansson STATIC
       ${JANSSON_SRC}
       ${JANSSON_HDR_PRIVATE}
       ${JANSSON_HDR_PUBLIC})
-   set_target_properties(jansson PROPERTIES
+   set_target_properties(bosjansson PROPERTIES
       POSITION_INDEPENDENT_CODE true)
 endif()
 
 if (JANSSON_EXAMPLES)
 	add_executable(simple_parse "${CMAKE_CURRENT_SOURCE_DIR}/examples/simple_parse.c")
-	target_link_libraries(simple_parse jansson)
+	target_link_libraries(simple_parse bosjansson)
 endif()
 
 # For building Documentation (uses Sphinx)
@@ -494,7 +494,7 @@ if (NOT JANSSON_WITHOUT_TESTS)
 
    set(api_tests
          test_array
-         test_copy
+         test_bos
          test_chaos
          test_dump
          test_dump_callback
@@ -518,8 +518,8 @@ if (NOT JANSSON_WITHOUT_TESTS)
    # Helper macro for building and linking a test program.
    macro(build_testprog name dir)
        add_executable(${name} ${dir}/${name}.c)
-       add_dependencies(${name} jansson)
-       target_link_libraries(${name} jansson)
+       add_dependencies(${name} bosjansson)
+       target_link_libraries(${name} bosjansson)
    endmacro(build_testprog)
 
    # Create executables and tests/valgrind tests for API tests.
@@ -601,7 +601,7 @@ set(JANSSON_INSTALL_INCLUDE_DIR   include CACHE PATH "Installation directory for
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR cmake)
 else()
-  set(DEF_INSTALL_CMAKE_DIR lib/cmake/jansson)
+  set(DEF_INSTALL_CMAKE_DIR lib/cmake/bosjansson)
 endif()
 
 set(JANSSON_INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
@@ -614,8 +614,8 @@ set(exec_prefix "\${prefix}")
 set(libdir      "\${exec_prefix}/${JANSSON_INSTALL_LIB_DIR}")
 set(includedir  "\${prefix}/${JANSSON_INSTALL_INCLUDE_DIR}")
 set(VERSION     ${JANSSON_DISPLAY_VERSION})
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/jansson.pc.in
-               ${CMAKE_CURRENT_BINARY_DIR}/jansson.pc @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bosjansson.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/bosjansson.pc @ONLY)
 
 # Make sure the paths are relative.
 foreach(p LIB BIN INCLUDE CMAKE)
@@ -652,7 +652,7 @@ configure_package_config_file(
 #
 option(JANSSON_INSTALL "Generate installation target" ON)
 if (JANSSON_INSTALL)
-  install(TARGETS jansson
+  install(TARGETS bosjansson
           EXPORT janssonTargets
           LIBRARY DESTINATION "lib"
           ARCHIVE DESTINATION "lib"
@@ -664,7 +664,7 @@ if (JANSSON_INSTALL)
 
   # Install the pkg-config.
   install(FILES
-          ${CMAKE_CURRENT_BINARY_DIR}/jansson.pc
+          ${CMAKE_CURRENT_BINARY_DIR}/bosjansson.pc
           DESTINATION lib/pkgconfig)
 
   # Install the configs.
@@ -675,9 +675,9 @@ if (JANSSON_INSTALL)
 
   # Install exports for the install-tree.
   install(EXPORT janssonTargets
-          NAMESPACE jansson::
+          NAMESPACE bosjansson::
           DESTINATION "${JANSSON_INSTALL_CMAKE_DIR}")
 endif()
 
-# For use when simply using add_library from a parent project to build jansson.
-set(JANSSON_LIBRARIES jansson CACHE STRING "jansson libraries")
+# For use when simply using add_library from a parent project to build bosjansson.
+set(JANSSON_LIBRARIES bosjansson CACHE STRING "bosjansson libraries")

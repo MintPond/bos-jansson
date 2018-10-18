@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: Jansson
+Name: BosJansson
 Description: Library for encoding, decoding and manipulating JSON data
 Version: @VERSION@
-Libs: -L${libdir} -ljansson
+Libs: -L${libdir} -lbosjansson
 Cflags: -I${includedir}

@@ -5,7 +5,7 @@
  * it under the terms of the MIT license. See LICENSE for details.
  */
 
-#include <jansson.h>
+#include <bosjansson.h>
 #include <string.h>
 #include <stdlib.h>
 #include "util.h"

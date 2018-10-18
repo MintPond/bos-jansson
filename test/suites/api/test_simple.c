@@ -6,7 +6,7 @@
  */
 
 #include <string.h>
-#include <jansson.h>
+#include <bosjansson.h>
 #include "util.h"
 
 static void test_bad_args(void)

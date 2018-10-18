@@ -7,4 +7,4 @@ dvi:
 	$(MAKE) SPHINXOPTS_EXTRA=-W html
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = jansson.pc
+pkgconfig_DATA = bosjansson.pc

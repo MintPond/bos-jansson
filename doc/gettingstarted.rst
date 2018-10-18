@@ -189,7 +189,7 @@ be found in the ``src/`` directory.
    script). Edit ``jansson_config.h.in``, replacing all ``@variable@``
    placeholders, and rename the file to ``jansson_config.h``.
 
-2. Make ``jansson.h`` and ``jansson_config.h`` available to the
+2. Make ``bosjansson.h`` and ``jansson_config.h`` available to the
    compiler, so that they can be found when compiling programs that
    use Jansson.
 
@@ -220,12 +220,12 @@ or newer is required to generate the documentation.
 Compiling Programs that Use Jansson
 ===================================
 
-Jansson involves one C header file, :file:`jansson.h`, so it's enough
+Jansson involves one C header file, :file:`bosjansson.h`, so it's enough
 to put the line
 
 ::
 
-    #include <jansson.h>
+    #include <bosjansson.h>
 
 in the beginning of every source file that uses Jansson.
 

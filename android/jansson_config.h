@@ -7,7 +7,7 @@
  *
  * This file specifies a part of the site-specific configuration for
  * Jansson, namely those things that affect the public API in
- * jansson.h.
+ * bosjansson.h.
  *
  * The configure script copies this file to jansson_config.h and
  * replaces @var@ substitutions by values that fit your system. If you

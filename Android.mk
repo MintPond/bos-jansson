@@ -4,6 +4,8 @@ include $(CLEAR_VARS)
 LOCAL_ARM_MODE := arm
 
 LOCAL_SRC_FILES := \
+    src/bos_deserializer.c \
+    src/bos_serializer.c \
     src/dump.c \
     src/error.c \
     src/hashtable.c \
@@ -25,6 +27,6 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SHARED_LIBRARIES := libc
 LOCAL_CFLAGS += -O3 -DHAVE_STDINT_H=1
 
-LOCAL_MODULE:= libjansson
+LOCAL_MODULE:= libbosjansson
 
 include $(BUILD_SHARED_LIBRARY)

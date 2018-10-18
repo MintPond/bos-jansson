@@ -13,7 +13,7 @@
 #include <jansson_config.h>
 
 #include <string.h>
-#include <jansson.h>
+#include <bosjansson.h>
 #include <stdio.h>
 #include <math.h>
 #include "util.h"

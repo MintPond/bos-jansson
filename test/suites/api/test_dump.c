@@ -7,7 +7,7 @@
 
 #include "jansson_private_config.h"
 
-#include <jansson.h>
+#include <bosjansson.h>
 #include <string.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>

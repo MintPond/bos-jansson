@@ -22,7 +22,7 @@
 #include <stdint.h>
 #endif
 
-#include "jansson.h"
+#include "bosjansson.h"
 #include "hashtable.h"
 #include "jansson_private.h"
 #include "utf.h"
@@ -933,6 +933,79 @@ double json_number_value(const json_t *json)
         return 0.0;
 }
 
+/*** bytes ***/
+
+json_t *json_bytes(void *value, size_t size)
+{
+    json_bytes_t *bytes = jsonp_malloc(sizeof(json_bytes_t));
+    if(!bytes)
+        return NULL;
+    json_init(&bytes->json, JSON_BYTES);
+
+    bytes->value = value;
+    bytes->size = size;
+    return &bytes->json;
+}
+
+const void *json_bytes_value(const json_t *json)
+{
+    if(!json_is_bytes(json))
+        return 0;
+
+    return json_to_bytes(json)->value;
+}
+
+size_t json_bytes_size(const json_t *json)
+{
+    if(!json_is_bytes(json))
+        return 0;
+
+    return json_to_bytes(json)->size;
+}
+
+int json_bytes_set(json_t *json, void *value, size_t size)
+{
+    if(!json_is_bytes(json))
+        return -1;
+
+    json_to_bytes(json)->value = value;
+    json_to_bytes(json)->size = size;
+
+    return 0;
+}
+
+static void json_delete_bytes(json_bytes_t *bytes)
+{
+    jsonp_free(bytes->value);
+    jsonp_free(bytes);
+}
+
+static int json_bytes_equal(const json_t *bytes1, const json_t *bytes2)
+{
+    size_t size = json_bytes_size(bytes1);
+    const void *ptr1 = json_bytes_value(bytes1);
+    const void *ptr2 = json_bytes_value(bytes2);
+
+    if (size != json_bytes_size(bytes2))
+        return 0;
+
+    return memcmp(ptr1, ptr2, size) == 0;
+}
+
+static json_t *json_bytes_copy(const json_t *json)
+{
+    json_t *result;
+    json_bytes_t *bytes = json_to_bytes(json);
+    void *value = jsonp_malloc(bytes->size);
+
+    memcpy(value, bytes->value, bytes->size);
+    result = json_bytes(value, bytes->size);
+    if(!result)
+        return NULL;
+
+    return result;
+}
+
 
 /*** simple values ***/
 
@@ -980,6 +1053,9 @@ void json_delete(json_t *json)
         case JSON_REAL:
             json_delete_real(json_to_real(json));
             break;
+        case JSON_BYTES:
+            json_delete_bytes(json_to_bytes(json));
+            break;
         default:
             return;
     }
@@ -1013,6 +1089,8 @@ int json_equal(const json_t *json1, const json_t *json2)
             return json_integer_equal(json1, json2);
         case JSON_REAL:
             return json_real_equal(json1, json2);
+        case JSON_BYTES:
+            return json_bytes_equal(json1, json2);
         default:
             return 0;
     }
@@ -1037,6 +1115,8 @@ json_t *json_copy(json_t *json)
             return json_integer_copy(json);
         case JSON_REAL:
             return json_real_copy(json);
+        case JSON_BYTES:
+            return json_bytes_copy(json);
         case JSON_TRUE:
         case JSON_FALSE:
         case JSON_NULL:
@@ -1064,6 +1144,8 @@ json_t *json_deep_copy(const json_t *json)
             return json_integer_copy(json);
         case JSON_REAL:
             return json_real_copy(json);
+        case JSON_BYTES:
+            return json_bytes_copy(json);
         case JSON_TRUE:
         case JSON_FALSE:
         case JSON_NULL:

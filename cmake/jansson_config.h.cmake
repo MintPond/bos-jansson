@@ -7,7 +7,7 @@
  *
  * This file specifies a part of the site-specific configuration for
  * Jansson, namely those things that affect the public API in
- * jansson.h.
+ * bosjansson.h.
  *
  * The CMake system will generate the jansson_config.h file and
  * copy it to the build and install directories.

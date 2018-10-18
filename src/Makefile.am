@@ -1,10 +1,12 @@
-EXTRA_DIST = jansson.def
+EXTRA_DIST = bosjansson.def
 
-include_HEADERS = jansson.h
+include_HEADERS = bosjansson.h
 nodist_include_HEADERS = jansson_config.h
 
-lib_LTLIBRARIES = libjansson.la
-libjansson_la_SOURCES = \
+lib_LTLIBRARIES = libbosjansson.la
+libbosjansson_la_SOURCES = \
+    bos_deserializer.c \
+    bos_serializer.c \
 	dump.c \
 	error.c \
 	hashtable.c \
@@ -21,7 +23,7 @@ libjansson_la_SOURCES = \
 	utf.c \
 	utf.h \
 	value.c
-libjansson_la_LDFLAGS = \
+libbosjansson_la_LDFLAGS = \
 	-no-undefined \
 	-export-symbols-regex '^json_' \
 	-version-info 15:0:11 \

@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <jansson.h>
+#include <bosjansson.h>
 #include "util.h"
 
 static int chaos_pos = 0;

@@ -18,7 +18,7 @@
 #include <locale.h>
 #endif
 
-#include <jansson.h>
+#include <bosjansson.h>
 
 #define failhdr fprintf(stderr, "%s:%d: ", __FILE__, __LINE__)
 

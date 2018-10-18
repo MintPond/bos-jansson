@@ -5,7 +5,7 @@
  * it under the terms of the MIT license. See LICENSE for details.
  */
 
-#include <jansson.h>
+#include <bosjansson.h>
 #include "util.h"
 
 static void test_equal_simple()

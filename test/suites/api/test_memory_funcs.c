@@ -1,5 +1,5 @@
 #include <string.h>
-#include <jansson.h>
+#include <bosjansson.h>
 
 #include "util.h"
 

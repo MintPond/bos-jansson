@@ -2,6 +2,7 @@ EXTRA_DIST = run check-exports
 
 check_PROGRAMS = \
 	test_array \
+	test_bos \
 	test_chaos \
 	test_copy \
 	test_dump \
@@ -29,6 +30,7 @@ test_memory_funcs_SOURCES = test_memory_funcs.c util.h
 test_number_SOURCES = test_number.c util.h
 test_object_SOURCES = test_object.c util.h
 test_pack_SOURCES = test_pack.c util.h
+test_serializer_SOURCES = test_serializer.c util.h
 test_simple_SOURCES = test_simple.c util.h
 test_sprintf_SOURCES = test_sprintf.c util.h
 test_unpack_SOURCES = test_unpack.c util.h

@@ -9,11 +9,11 @@ API Reference
 Preliminaries
 =============
 
-All declarations are in :file:`jansson.h`, so it's enough to
+All declarations are in :file:`bosjansson.h`, so it's enough to
 
 ::
 
-   #include <jansson.h>
+   #include <bosjansson.h>
 
 in each source file.
 

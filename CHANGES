@@ -778,7 +778,7 @@ Released 2009-11-08
   could not be opened in `json_load_file()`
 * Fix an assertion failure in decoder caused by a minus sign without a
   digit after it
-* Remove an unneeded include of ``stdint.h`` in ``jansson.h``
+* Remove an unneeded include of ``stdint.h`` in ``bosjansson.h``
 
 
 Version 1.1.1
@@ -813,7 +813,7 @@ Released 2009-10-20
 * Make singleton values thread-safe (``true``, ``false`` and ``null``)
 * Enhance circular reference handling
 * Don't define ``-std=c99`` in ``AM_CFLAGS``
-* Add C++ guards to ``jansson.h``
+* Add C++ guards to ``bosjansson.h``
 * Minor performance and portability improvements
 * Expand test coverage
 

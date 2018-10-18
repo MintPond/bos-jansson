@@ -55,13 +55,19 @@ typedef enum {
     JSON_REAL,
     JSON_TRUE,
     JSON_FALSE,
-    JSON_NULL
+    JSON_NULL,
+    JSON_BYTES
 } json_type;
 
 typedef struct json_t {
     json_type type;
     volatile size_t refcount;
 } json_t;
+
+typedef struct bos_t {
+    const void *data;
+    uint32_t size;
+} bos_t;
 
 #ifndef JANSSON_USING_CMAKE /* disabled if using cmake */
 #if JSON_INTEGER_IS_LONG_LONG
@@ -89,6 +95,7 @@ typedef long json_int_t;
 #define json_boolean_value     json_is_true
 #define json_is_boolean(json)  (json_is_true(json) || json_is_false(json))
 #define json_is_null(json)     ((json) && json_typeof(json) == JSON_NULL)
+#define json_is_bytes(json)    ((json) && json_typeof(json) == JSON_BYTES)
 
 /* construction, destruction, reference counting */
 
@@ -104,6 +111,7 @@ json_t *json_true(void);
 json_t *json_false(void);
 #define json_boolean(val)      ((val) ? json_true() : json_false())
 json_t *json_null(void);
+json_t *json_bytes(void *bytes, size_t size);
 
 /* do not call JSON_INTERNAL_INCREF or JSON_INTERNAL_DECREF directly */
 #if JSON_HAVE_ATOMIC_BUILTINS
@@ -282,6 +290,10 @@ int json_string_setn_nocheck(json_t *string, const char *value, size_t len);
 int json_integer_set(json_t *integer, json_int_t value);
 int json_real_set(json_t *real, double value);
 
+const void *json_bytes_value(const json_t *bos);
+size_t json_bytes_size(const json_t *bos);
+int json_bytes_set(json_t *bos, void *value, size_t size);
+
 /* pack, unpack */
 
 json_t *json_pack(const char *fmt, ...) JANSSON_ATTRS(warn_unused_result);
@@ -311,6 +323,13 @@ int json_equal(const json_t *value1, const json_t *value2);
 json_t *json_copy(json_t *value) JANSSON_ATTRS(warn_unused_result);
 json_t *json_deep_copy(const json_t *value) JANSSON_ATTRS(warn_unused_result);
 
+/* bos */
+
+int bos_validate(const void *data, size_t size);
+unsigned int bos_sizeof(const void *data);
+json_t *bos_deserialize(const void *data, json_error_t *error) JANSSON_ATTRS(warn_unused_result);
+bos_t *bos_serialize(json_t *value, json_error_t *error) JANSSON_ATTRS(warn_unused_result);
+void bos_free(bos_t *ptr);
 
 /* decoding */
 

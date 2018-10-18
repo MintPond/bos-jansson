@@ -21,7 +21,7 @@
 #include <unistd.h>
 #endif
 
-#include "jansson.h"
+#include "bosjansson.h"
 #include "strbuffer.h"
 #include "utf.h"
 

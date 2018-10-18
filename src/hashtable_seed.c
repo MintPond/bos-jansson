@@ -42,7 +42,7 @@
 #include <windows.h>
 #endif
 
-#include "jansson.h"
+#include "bosjansson.h"
 
 
 static uint32_t buf_to_uint32(char *data) {

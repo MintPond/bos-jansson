@@ -7,7 +7,7 @@
  */
 
 #include <string.h>
-#include "jansson.h"
+#include "bosjansson.h"
 #include "jansson_private.h"
 #include "utf.h"
 

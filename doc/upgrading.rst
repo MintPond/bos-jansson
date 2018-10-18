@@ -52,7 +52,7 @@ List of Incompatible Changes
     :type:`long long` is supported on your system or not. This makes
     the whole 64-bit integer range available on most modern systems.
 
-    ``jansson.h`` has a typedef :type:`json_int_t` to the underlying
+    ``bosjansson.h`` has a typedef :type:`json_int_t` to the underlying
     integer type. :type:`int` should still be used in most cases when
     dealing with smallish JSON integers, as the compiler handles
     implicit type coercion. Only when the full 64-bit range is needed,

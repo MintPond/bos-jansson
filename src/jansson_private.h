@@ -10,7 +10,7 @@
 
 #include "jansson_private_config.h"
 #include <stddef.h>
-#include "jansson.h"
+#include "bosjansson.h"
 #include "hashtable.h"
 #include "strbuffer.h"
 
@@ -31,6 +31,28 @@
 #define va_copy(a, b)  memcpy(&(a), &(b), sizeof(va_list))
 #endif
 #endif
+
+#define TRUE 1;
+#define FALSE 0;
+
+typedef enum {
+    BOS_NULL   = 0x00,
+    BOS_BOOL   = 0x01,
+    BOS_INT8   = 0x02,
+    BOS_INT16  = 0x03,
+    BOS_INT32  = 0x04,
+    BOS_INT64  = 0x05,
+    BOS_UINT8  = 0x06,
+    BOS_UINT16 = 0x07,
+    BOS_UINT32 = 0x08,
+    BOS_UINT64 = 0x09,
+    BOS_FLOAT  = 0x0A,
+    BOS_DOUBLE = 0x0B,
+    BOS_STRING = 0x0C,
+    BOS_BYTES  = 0x0D,
+    BOS_ARRAY  = 0x0E,
+    BOS_OBJ    = 0x0F
+} bos_data_type;
 
 typedef struct {
     json_t json;
@@ -60,11 +82,18 @@ typedef struct {
     json_int_t value;
 } json_integer_t;
 
+typedef struct {
+    json_t json;
+    void *value;
+    size_t size;
+} json_bytes_t;
+
 #define json_to_object(json_)  container_of(json_, json_object_t, json)
 #define json_to_array(json_)   container_of(json_, json_array_t, json)
 #define json_to_string(json_)  container_of(json_, json_string_t, json)
 #define json_to_real(json_)    container_of(json_, json_real_t, json)
 #define json_to_integer(json_) container_of(json_, json_integer_t, json)
+#define json_to_bytes(json_)   container_of(json_, json_bytes_t, json)
 
 /* Create a string by taking ownership of an existing buffer */
 json_t *jsonp_stringn_nocheck_own(const char *value, size_t len);

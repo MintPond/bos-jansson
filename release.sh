@@ -35,9 +35,9 @@ if [ "$dv" != "$v" ]; then
 fi
 
 [ -f Makefile ] && make distclean || true
-rm -f jansson-$v.tar.*
-rm -rf jansson-$v-doc
-rm -f jansson-$v-doc.tar.*
+rm -f bosjansson-$v.tar.*
+rm -rf bosjansson-$v-doc
+rm -f bosjansson-$v-doc.tar.*
 
 autoreconf -fi
 ./configure
@@ -52,19 +52,19 @@ make dist-bzip2
 
 # Sign source tarballs
 for s in gz bz2; do
-    gpg --detach-sign --armor jansson-$v.tar.$s
+    gpg --detach-sign --armor bosjansson-$v.tar.$s
 done
 
 # Build documentation
 make html
-mv doc/_build/html jansson-$v-doc
+mv doc/_build/html bosjansson-$v-doc
 
 # Make and sign documentation tarballs
 for s in gz bz2; do
     [ $s = gz ] && compress=gzip
     [ $s = bz2 ] && compress=bzip2
     tar cf - jansson-$v-doc | $compress -9 -c > jansson-$v-doc.tar.$s
-    gpg --detach-sign --armor jansson-$v-doc.tar.$s
+    gpg --detach-sign --armor bosjansson-$v-doc.tar.$s
 done
 
 echo "All done"

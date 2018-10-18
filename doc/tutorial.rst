@@ -91,10 +91,10 @@ The Program
 First the includes::
 
     #include <string.h>
-    #include <jansson.h>
+    #include <bosjansson.h>
 
 Like all the programs using Jansson, we need to include
-:file:`jansson.h`.
+:file:`bosjansson.h`.
 
 The following definitions are used to build the GitHub API request
 URL::

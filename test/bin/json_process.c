@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <jansson.h>
+#include <bosjansson.h>
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>

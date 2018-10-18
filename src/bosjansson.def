@@ -1,4 +1,10 @@
 EXPORTS
+    bos_deserialize
+    bos_serialize
+    json_bytes
+    json_bytes_value
+    json_bytes_length
+    json_bytes_set
     json_delete
     json_true
     json_false
