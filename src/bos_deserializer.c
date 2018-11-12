@@ -52,7 +52,7 @@ static void error_set(json_error_t *error, enum json_error_code code, const char
 
 typedef struct {
     const void *data;
-    void *pos;
+    unsigned char *pos;
     uint32_t size;
 } buffer_t;
 

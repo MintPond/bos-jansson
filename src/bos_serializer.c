@@ -53,7 +53,7 @@ static void error_set(json_error_t *error, enum json_error_code code, const char
 
 typedef struct {
     void *data;
-    void *pos;
+    unsigned char *pos;
     size_t size; // size of data
     size_t allocated; // size of allocated memory
 } buffer_t;
@@ -75,7 +75,7 @@ static int ensure_buffer_size(buffer_t *buffer, size_t amount, json_error_t *err
     }
 
     buffer->allocated = new_size;
-    buffer->pos = buffer->data + buffer->size;
+    buffer->pos = (unsigned char *)buffer->data + buffer->size;
     memcpy(buffer->data, old_data, buffer->size);
     jsonp_free(old_data);
     return TRUE;
