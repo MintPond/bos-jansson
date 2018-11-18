@@ -312,7 +312,7 @@ int bos_validate(const void *data, size_t size) {
         return FALSE;
 
     memcpy(&data_size, data, sizeof(uint32_t));
-    if (data_size < size)
+    if (size < data_size)
         return FALSE;
 
     return TRUE;
