@@ -130,13 +130,13 @@ static bos_data_type get_data_type(json_t *value) {
 
             if (integer < 0) {
 
-                if (integer >= -128)
+                if (integer >= INT8_MIN)
                     return BOS_INT8;
 
-                if (integer >= -32768)
+                if (integer >= INT16_MIN)
                     return BOS_INT16;
 
-                if (integer >= -2147483648)
+                if (integer >= INT32_MIN)
                     return BOS_INT32;
 
                 return BOS_INT64;
