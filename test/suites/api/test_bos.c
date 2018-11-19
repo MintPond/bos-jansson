@@ -715,8 +715,8 @@ static void test_format_string() {
     if (str_len != strlen("string"))
         fail("format string: incorrect string length");
 
+    memset(data_value, (char)0, strlen("string") + 1);
     read(data_value, serialized, 6, strlen("string"));
-    memset(data_value + strlen("string") + 1, (char)0, sizeof(char));
     if (strcmp(data_value, "string") != 0)
         fail("format string: incorrect data value");
 
@@ -843,8 +843,8 @@ static void test_format_obj() {
     if (key0_name_len != strlen("key0"))
         fail("format object: key0 name length is incorrect");
 
+    memset(key0_name, (char)0, strlen("key0") + 1);
     read(key0_name, serialized, 7, strlen("key0"));
-    memset(key0_name + strlen("key0") + 1, (char)0, sizeof(char));
     if (strcmp(key0_name, "key0") != 0)
         fail("format object: key0 name is incorrect");
 
