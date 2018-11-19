@@ -430,13 +430,9 @@ bos_t *bos_serialize(json_t *value, json_error_t *error) {
     if (!write_value(value, buffer, error))
         return NULL;
 
+    // write size
     size = (uint32_t)buffer->size;
-
-    buffer->pos = buffer->data;
-    if (!write_buffer(buffer, &size, 4, error))
-        return NULL;
-
-    buffer->size -= 4; // remove extra 4 caused by writing the size to the beginning
+    memcpy(buffer->data, &size, sizeof(uint32_t));
 
     result = (bos_t *)jsonp_malloc(sizeof(bos_t));
     result->data = buffer->data;

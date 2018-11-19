@@ -10,8 +10,10 @@
 #include <bosjansson.h>
 #include "util.h"
 
+const size_t bytes_size = 200000;
+
 static void read(void *destination, bos_t *serialized, size_t pos, size_t size) {
-    memcpy(destination, serialized->data + pos, size);
+    memcpy(destination, (char *)serialized->data + pos, size);
 }
 
 /*** serialize->deserialize tests ***/
@@ -173,7 +175,7 @@ static void test_key_bytes(json_t *object) {
     value = (void *)json_bytes_value(key);
     len = json_bytes_size(key);
 
-    if (len != 2)
+    if (len != bytes_size)
         fail("deserialized 'bytes' key has incorrect number of bytes");
 
     if (*(uint8_t *)value != 1)
@@ -363,8 +365,8 @@ static void test_serialize_deserialize(void) {
     json_t *array = json_array();
     json_t *inner_object = json_object();
     bos_t *serialized;
-    void *bytes = malloc(2);
-    memset(bytes, 1, 2);
+    void *bytes = malloc(bytes_size);
+    memset(bytes, 1, bytes_size);
 
     json_array_append_new(array, json_string("string"));
     json_array_append_new(array, json_integer(1));
@@ -385,7 +387,7 @@ static void test_serialize_deserialize(void) {
     json_object_set_new(object, "uint32", json_integer(4294967290));
     json_object_set_new(object, "float", json_real(5.5));
     json_object_set_new(object, "string", json_string("this is a string"));
-    json_object_set_new(object, "bytes", json_bytes(bytes, 2));
+    json_object_set_new(object, "bytes", json_bytes(bytes, bytes_size));
     json_object_set(object, "array", array);
     json_object_set(object, "obj", inner_object);
 
@@ -403,7 +405,7 @@ static void test_serialize_deserialize(void) {
     test_deserialize(serialized);
 
     bos_free(serialized);
-    free(bytes);
+    //free(bytes);
     free(error);
 }
 
@@ -726,7 +728,7 @@ static void test_format_string() {
 
 static void test_format_bytes() {
 
-    void *bytes = malloc(300);
+    char *bytes = (char *)malloc(300);
     uint32_t data_size;
     uint8_t data_type;
     uint8_t bytes_size_var;
