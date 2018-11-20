@@ -53,18 +53,21 @@ static void error_set(json_error_t *error, enum json_error_code code, const char
 typedef struct {
     const void *data;
     unsigned char *pos;
+    uint32_t read;
     uint32_t size;
 } buffer_t;
 
 static JSON_INLINE void read_buffer(buffer_t *buffer, void *destination, size_t size) {
     memcpy(destination, buffer->pos, size);
-    buffer->pos += size;
+    buffer->pos += (uint32_t)size;
+    buffer->read += (uint32_t)size;
 }
 
 static int buffer_init(buffer_t *buffer, const void *data)
 {
     buffer->data = data;
     buffer->pos = (void *)data;
+    buffer->read = 0;
     read_buffer(buffer, &buffer->size, sizeof(uint32_t));
     return 0;
 }
@@ -289,16 +292,193 @@ static json_t *read_data(buffer_t *buffer, bos_data_type data_type, json_error_t
 
 json_t *bos_deserialize(const void *data, json_error_t *error) {
 
-    buffer_t *buffer = jsonp_malloc(sizeof(buffer_t));
-    buffer_init(buffer, data);
+    buffer_t buffer;
+    buffer_init(&buffer, data);
     jsonp_error_init(error, "<bos_deserialize>");
 
-    if (buffer->size < 5) {
+    if (buffer.size < 5) {
         error_set(error, json_error_invalid_format, "size too small to be valid");
         return NULL;
     }
 
-    return read_value(buffer, error);
+    return read_value(&buffer, error);
+}
+
+/*** validation ***/
+
+static int validate_value(buffer_t *buffer);
+
+static JSON_INLINE int validate_read(buffer_t *buffer, unsigned int amount) {
+    if (buffer->read + amount <= buffer->size) {
+        buffer->read += amount;
+        buffer->pos += amount;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static JSON_INLINE int validate_read_only(buffer_t *buffer, unsigned int amount) {
+    if (buffer->read + amount <= buffer->size) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+static JSON_INLINE int validate_uvarint(buffer_t *buffer, uint64_t *result) {
+
+    uint8_t type_flag;
+    uint64_t le64;
+    uint32_t le32;
+    uint16_t le16;
+
+    if (!validate_read_only(buffer, sizeof(uint8_t)))
+        return FALSE;
+
+    read_buffer(buffer, &type_flag, sizeof(uint8_t));
+
+    switch (type_flag) {
+        case 0xFF:
+
+            if (!validate_read_only(buffer, sizeof(uint64_t)))
+                return FALSE;
+
+            read_buffer(buffer, &le64, sizeof(uint64_t));
+            *(result) = le64;
+            return TRUE;
+
+        case 0xFE:
+
+            if (!validate_read_only(buffer, sizeof(uint32_t)))
+                return FALSE;
+
+            read_buffer(buffer, &le32, sizeof(uint32_t));
+            *(result) = le32;
+            return TRUE;
+
+        case 0xFD:
+
+            if (!validate_read_only(buffer, sizeof(uint16_t)))
+                return FALSE;
+
+            read_buffer(buffer, &le16, sizeof(uint16_t));
+            *(result) = le16;
+            return TRUE;
+
+        default:
+            *(result) = type_flag;
+            return TRUE;
+    }
+}
+
+static JSON_INLINE int validate_string(buffer_t *buffer) {
+
+    uint64_t len;
+
+    if (!validate_uvarint(buffer, &len))
+        return FALSE;
+
+    if (len > 0) {
+        return validate_read(buffer, sizeof(char) * len);
+    }
+    else {
+        return TRUE;
+    }
+}
+
+static JSON_INLINE int validate_bytes(buffer_t *buffer) {
+
+    uint64_t len;
+
+    if (!validate_uvarint(buffer, &len))
+        return FALSE;
+
+    if (len > 0) {
+        return validate_read(buffer, sizeof(char) * len);
+    }
+    else {
+        return TRUE;
+    }
+}
+
+static JSON_INLINE int validate_array(buffer_t *buffer) {
+
+    uint64_t len;
+
+    if (!validate_uvarint(buffer, &len))
+        return FALSE;
+
+    for (uint64_t i = 0; i < len; ++i) {
+        if (!validate_value(buffer))
+            return FALSE;
+    }
+
+    return TRUE;
+}
+
+static JSON_INLINE int validate_obj(buffer_t *buffer) {
+
+    uint64_t len;
+
+    if (!validate_uvarint(buffer, &len))
+        return FALSE;
+
+    for (uint64_t i = 0; i < len; ++i) {
+
+        if (!validate_string(buffer))
+            return FALSE;
+
+        if (!validate_value(buffer))
+            return FALSE;
+    }
+
+    return TRUE;
+}
+
+static int validate_value(buffer_t *buffer) {
+
+    if (!validate_read_only(buffer, sizeof(uint8_t)))
+        return FALSE;
+
+    uint8_t data_type;
+    read_buffer(buffer, &data_type, sizeof(uint8_t));
+
+    switch (data_type) {
+        case BOS_NULL:
+            return TRUE;
+        case BOS_BOOL:
+            return validate_read(buffer, sizeof(uint8_t));
+        case BOS_INT8:
+            return validate_read(buffer, sizeof(int8_t));
+        case BOS_INT16:
+            return validate_read(buffer, sizeof(int16_t));
+        case BOS_INT32:
+            return validate_read(buffer, sizeof(int32_t));
+        case BOS_INT64:
+            return validate_read(buffer, sizeof(int64_t));
+        case BOS_UINT8:
+            return validate_read(buffer, sizeof(uint8_t));
+        case BOS_UINT16:
+            return validate_read(buffer, sizeof(uint16_t));
+        case BOS_UINT32:
+            return validate_read(buffer, sizeof(uint32_t));
+        case BOS_UINT64:
+            return validate_read(buffer, sizeof(uint64_t));
+        case BOS_FLOAT:
+            return validate_read(buffer, sizeof(float));
+        case BOS_DOUBLE:
+            return validate_read(buffer, sizeof(double));
+        case BOS_STRING:
+            return validate_string(buffer);
+        case BOS_BYTES:
+            return validate_bytes(buffer);
+        case BOS_ARRAY:
+            return validate_array(buffer);
+        case BOS_OBJ:
+            return validate_obj(buffer);
+        default:
+            return FALSE;
+    }
 }
 
 int bos_validate(const void *data, size_t size) {
@@ -306,16 +486,22 @@ int bos_validate(const void *data, size_t size) {
     uint32_t data_size;
 
     if (data == NULL)
-        return 0/*false*/;
+        return FALSE;
 
+    // valid data would never be less than 5 bytes
     if (size < 5)
         return FALSE;
 
+    // make sure actual data is at least the size indicated by the data
     memcpy(&data_size, data, sizeof(uint32_t));
-    if (size < data_size)
+    if (data_size < 5 || size < data_size)
         return FALSE;
 
-    return TRUE;
+    // deeper length/format validation
+    buffer_t buffer;
+    buffer_init(&buffer, data);
+
+    return validate_value(&buffer);
 }
 
 unsigned int bos_sizeof(const void *data) {

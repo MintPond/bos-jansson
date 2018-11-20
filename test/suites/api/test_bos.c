@@ -405,7 +405,6 @@ static void test_serialize_deserialize(void) {
     test_deserialize(serialized);
 
     bos_free(serialized);
-    //free(bytes);
     free(error);
 }
 
@@ -862,6 +861,283 @@ static void test_format_obj() {
     free(key0_name);
 }
 
+/*** BOS validation tests ***/
+
+static void test_validation(bos_t *serialized) {
+
+    uint32_t invalid_size;
+
+    if (!bos_validate(serialized->data, serialized->size))
+        fail("validation failed but should have succeeded");
+
+    invalid_size = serialized->size - 1;
+
+    // should fail if data size is less than the size indicated in the data
+    if (bos_validate(serialized->data, invalid_size))
+        fail("validation succeeded but should have failed");
+
+    // should fail if the data is corrupt and the size indicated in the data is smaller than required
+    memcpy((void *)serialized->data, &invalid_size, sizeof(uint32_t));
+    if (bos_validate(serialized->data, invalid_size))
+        fail("validation succeeded but should have failed");
+}
+
+static void test_validation_obj() {
+
+    json_error_t error;
+    json_t *object = json_object();
+    json_t *array = json_array();
+    json_t *inner_object = json_object();
+    bos_t *serialized;
+    void *bytes = malloc(bytes_size);
+    memset(bytes, 1, bytes_size);
+
+    printf("Testing validation: obj");
+
+    json_array_append_new(array, json_string("string"));
+    json_array_append_new(array, json_integer(1));
+    json_array_append_new(array, json_real(2.2));
+    json_array_append_new(array, json_boolean(0));
+
+    json_object_set_new(inner_object, "str", json_string("str"));
+    json_object_set_new(inner_object, "int", json_integer(1));
+    json_object_set_new(inner_object, "float", json_real(2.3));
+    json_object_set_new(inner_object, "bool", json_boolean(1));
+
+    json_object_set_new(object, "bool", json_boolean(1));
+    json_object_set_new(object, "int8", json_integer(-1));
+    json_object_set_new(object, "int16", json_integer(-300));
+    json_object_set_new(object, "int32", json_integer(-2147483640));
+    json_object_set_new(object, "uint8", json_integer(254));
+    json_object_set_new(object, "uint16", json_integer(4000));
+    json_object_set_new(object, "uint32", json_integer(4294967290));
+    json_object_set_new(object, "float", json_real(5.5));
+    json_object_set_new(object, "string", json_string("this is a string"));
+    json_object_set_new(object, "bytes", json_bytes(bytes, bytes_size));
+    json_object_set(object, "array", array);
+    json_object_set(object, "obj", inner_object);
+
+    serialized = bos_serialize(object, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    json_decref(object);
+    json_decref(array);
+    json_decref(inner_object);
+    bos_free(serialized);
+}
+
+static void test_validation_int8() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * int8 = json_integer(-1);
+
+    printf("Testing validation: int8");
+
+    serialized = bos_serialize(int8, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_int16() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * int16 = json_integer(-300);
+
+    printf("Testing validation: int16");
+
+    serialized = bos_serialize(int16, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_int32() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * int32 = json_integer(-2147483640);
+
+    printf("Testing validation: int32");
+
+    serialized = bos_serialize(int32, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_int64() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * int64 = json_integer(-3000000000);
+
+    printf("Testing validation: int64");
+
+    serialized = bos_serialize(int64, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_uint8() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * uint8 = json_integer(254);
+
+    printf("Testing validation: uint8");
+
+    serialized = bos_serialize(uint8, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_uint16() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * uint16 = json_integer(4000);
+
+    printf("Testing validation: uint16");
+
+    serialized = bos_serialize(uint16, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_uint32() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * uint32 = json_integer(4294967290);
+
+    printf("Testing validation: uint32");
+
+    serialized = bos_serialize(uint32, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_uint64() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * uint64 = json_integer(7000000000);
+
+    printf("Testing validation: uint64");
+
+    serialized = bos_serialize(uint64, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_float() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * float32 = json_real(7.7);
+
+    printf("Testing validation: float");
+
+    serialized = bos_serialize(float32, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_string() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t * str = json_string("validation test");
+
+    printf("Testing validation: string");
+
+    serialized = bos_serialize(str, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_bytes() {
+
+    json_error_t error;
+    bos_t *serialized;
+    char *data = (char *)malloc(300);
+    json_t *bytes = json_bytes(data, 300);
+
+    printf("Testing validation: bytes");
+
+    serialized = bos_serialize(bytes, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+static void test_validation_array() {
+
+    json_error_t error;
+    bos_t *serialized;
+    json_t *array = json_array();
+    json_t *elem1 = json_integer(1);
+
+    printf("Testing validation: array");
+
+    json_array_append_new(array, elem1);
+
+    serialized = bos_serialize(array, &error);
+    if (serialized == NULL)
+        fail("validation serialize failed");
+
+    test_validation(serialized);
+
+    bos_free(serialized);
+}
+
+
 static void run_tests()
 {
     test_serialize_deserialize();
@@ -881,4 +1157,17 @@ static void run_tests()
     test_format_bytes();
     test_format_array();
     test_format_obj();
+    test_validation_obj();
+    test_validation_int8();
+    test_validation_int16();
+    test_validation_int32();
+    test_validation_int64();
+    test_validation_uint8();
+    test_validation_uint16();
+    test_validation_uint32();
+    test_validation_uint64();
+    test_validation_float();
+    test_validation_string();
+    test_validation_bytes();
+    test_validation_array();
 }
