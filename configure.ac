@@ -149,7 +149,7 @@ fi
 AC_SUBST([AM_CFLAGS])
 
 AC_CONFIG_FILES([
-        jansson.pc
+        bosjansson.pc
         Makefile
         doc/Makefile
         src/Makefile
