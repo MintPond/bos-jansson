@@ -10,6 +10,7 @@
 
 #include "jansson_private_config.h"
 #include <stddef.h>
+#include <stdint.h>
 #include "bosjansson.h"
 #include "hashtable.h"
 #include "strbuffer.h"
